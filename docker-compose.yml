@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
+    image: localstack/localstack:0.14.2
+    network_mode: bridge
+    ports:
+      - "127.0.0.1:4566:4566"            # 기본 GW
+      - "127.0.0.1:53:53"                #
+      - "127.0.0.1:53:53/udp"            #
+      - "127.0.0.1:443:443"              #
+      - "127.0.0.1:4510-4530:4510-4530"  # LOCALSTACK 내 허용 포트
+      - "127.0.0.1:4571:4571"            #
+    environment:
+      - LAMBDA_EXECUTOR=local
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DISABLE_CORS_CHECKS=1
+      - AWS_DEFAULT_REGION=ap-northeast-2 # aws region, id, key
+      - AWS_ACCESS_KEY_ID=deneb
+      - AWS_SECRET_ACCESS_KEY=deneb
+    volumes:
+      - "${TMPDIR:-/tmp}/localstack:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+networks:
+  mysql-compose-network:
+    driver: bridge
